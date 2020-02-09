@@ -1,6 +1,27 @@
 <!DOCTYPE HTML>
 <html >
-<body>
-<div>{{some}} </div>
-</body>
+    <body>
+
+        <div>
+        <form method = "post">
+            <input type="text" name="text" placeholder="Input text" />
+            <input type="text" name="tag" placeholder="Tag" />
+            <button type="Submit">Add</button>
+         </form>
+        </div>
+
+        <div>List of messages</div>
+        <form method = "post" action = "filter">
+            <input type = "text" name = "filter">
+            <button type = "submit">Find By Tag</button>
+        </form>
+        {{#messages}}
+        <div>
+            <b>{{id}}</b>
+            <span>{{text}}</span>
+            <i>{{tag}}</i>
+         </div>
+
+        {{/messages}}
+    </body>
 </html>
