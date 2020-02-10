@@ -1,4 +1,4 @@
-package com.example.twitterclone;
+package com.example.twitterclone.controller;
 
 import com.example.twitterclone.domain.Message;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,21 +12,16 @@ import java.util.List;
 import java.util.Map;
 
 @Controller
-public class GreetingController {
+public class MainController {
 
     @Autowired
     private MessageRepo messageRepo;
 
-    @GetMapping("/greeting")
-    public String greeting(
-            @RequestParam(name="name", required=false, defaultValue="World") String name,
-            Map<String, Object> model // то куда складывать данные, которые возвратятся пользователю
-    ) {
-        model.put("name", name);
-        return "greeting";
-    }
+    @GetMapping("/")
+    public String greeting(String name, Map<String, Object> model ) // то куда складывать данные, которые возвратятся пользователю
+     { return "greeting"; }
 
-    @GetMapping
+    @GetMapping("/main")
     public String main(Map<String, Object> model) {
         Iterable<Message> messages = messageRepo.findAll();
 
@@ -35,7 +30,7 @@ public class GreetingController {
         return "main";
     }
 
-    @PostMapping
+    @PostMapping("/main")
     public String add(@RequestParam String text, @RequestParam String tag, Map<String, Object> model) {  // @RequestParam выдергивает с запросов (либо форма, либо url) значения
         // сохранил
         Message message = new Message(text, tag);
