@@ -5,6 +5,7 @@ import com.example.twitterclone.domain.User;
 import com.example.twitterclone.repos.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 
@@ -15,10 +16,14 @@ import java.util.Map;
 public class RegistrationController {
     @Autowired
     private UserRepo userRepo;
+
     @GetMapping("/registration")
-    public String registration() {
-        return "registration";
+    public String registration(Model model)
+    {
+        model.addAttribute("message", "");
+        return ("/registration");
     }
+
     @PostMapping("/registration")
     public String addUser(User user, Map<String, Object> model) {
         User userFromDb = userRepo.findByUsername(user.getUsername());

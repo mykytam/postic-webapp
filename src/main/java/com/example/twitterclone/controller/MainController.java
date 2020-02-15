@@ -49,6 +49,7 @@ public class MainController {
         // изъял из репозитория, положил в модель, отдал пользователю
         Iterable<Message> messages = messageRepo.findAll();
         model.put("messages", messages);
+        model.put("filter", "");
         return "main";
     }
 }
