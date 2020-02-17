@@ -29,6 +29,7 @@
     <div>
         <@l.logout />
         <span>
+             <br>
             <a href="/user">User list</a>
         </span>
     </div>
