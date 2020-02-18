@@ -11,7 +11,7 @@
     </head>
     <body>
     <#include "navbar.ftlh">
-    <div class="container">
+    <div class="container mt-5">
         <#nested >
     </div>
     <!-- Optional JavaScript -->
