@@ -38,7 +38,9 @@ public class UserService implements UserDetailsService {
 
         if (!StringUtils.isEmpty(user.getEmail())) {
             String message = String.format(
-                    "Hello, %s! \n"
+                    "Hello, %s! \n" +
+                            "Welcome to Twitter Clone app. Please visit next link http://localhost/:8080/activate/%s, to verify your account",
+                    user.getUsername(), user.getActivationCode()
             );
             mailSender.send(user.getEmail(), "Activation code", message);
         }
