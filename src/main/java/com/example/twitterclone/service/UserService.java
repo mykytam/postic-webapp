@@ -17,8 +17,10 @@ import java.util.UUID;
 public class UserService implements UserDetailsService {
     @Autowired
     private UserRepo userRepo;
+
     @Autowired
     private MailSender mailSender;
+
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return userRepo.findByUsername(username);
@@ -27,21 +29,24 @@ public class UserService implements UserDetailsService {
     public boolean addUser(User user) {
         User userFromDb = userRepo.findByUsername(user.getUsername());
 
-        if(userFromDb != null) {
+        if (userFromDb != null) {
             return false;
         }
 
         user.setActive(true);
         user.setRoles(Collections.singleton(Role.USER));
         user.setActivationCode(UUID.randomUUID().toString());
+
         userRepo.save(user);
 
         if (!StringUtils.isEmpty(user.getEmail())) {
             String message = String.format(
                     "Hello, %s! \n" +
-                            "Welcome to Twitter Clone app. Please visit next link http://localhost/:8080/activate/%s, to verify your account",
-                    user.getUsername(), user.getActivationCode()
+                            "Welcome to Sweater. Please, visit next link: http://localhost:8080/activate/%s",
+                    user.getUsername(),
+                    user.getActivationCode()
             );
+
             mailSender.send(user.getEmail(), "Activation code", message);
         }
 
@@ -49,8 +54,9 @@ public class UserService implements UserDetailsService {
     }
 
     public boolean activateUser(String code) {
-        User user  = userRepo.findByActivationCode(code);
-        if(user == null ) {
+        User user = userRepo.findByActivationCode(code);
+
+        if (user == null) {
             return false;
         }
 
