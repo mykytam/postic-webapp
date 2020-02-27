@@ -6,7 +6,7 @@ import javax.persistence.*;
 public class Message {
     @Id // идентификатор, чтобы различать две записи в одной таблице
     @GeneratedValue(strategy= GenerationType.AUTO) // фреймворк и база данных сами разбираются, как генерируются идентификаторы
-    private Integer id;
+    private Long id;
     private String text;
     private String tag;
 
@@ -33,11 +33,9 @@ public class Message {
 
     public void setAuthor(User author) { this.author = author; }
 
-    public Integer getId() {
-        return id;
-    }
+    public Long getId() { return id; }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
