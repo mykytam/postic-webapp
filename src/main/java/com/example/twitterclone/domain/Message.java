@@ -1,13 +1,20 @@
 package com.example.twitterclone.domain;
 
+import org.hibernate.validator.constraints.Length;
+
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 
 @Entity // This tells Hibernate to make a table out of this class
 public class Message {
     @Id // идентификатор, чтобы различать две записи в одной таблице
     @GeneratedValue(strategy= GenerationType.AUTO) // фреймворк и база данных сами разбираются, как генерируются идентификаторы
     private Long id;
+
+    @NotBlank(message = "Please fill in the message")
+    @Length(max = 2048, message = "Message is too long")
     private String text;
+    @Length(max = 255, message = "Tag is too long")
     private String tag;
 
     // меппинг, указание по поводу хранения в БД
