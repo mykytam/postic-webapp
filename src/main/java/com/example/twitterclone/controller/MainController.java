@@ -77,6 +77,8 @@ public class MainController {
                file.transferTo(new File(uploadPath + "/" + resultFileName));
                message.setFilename(resultFileName);
            }
+
+           model.addAttribute("message", null); // удаления message из модели после валидации, чтобы после добавления не получить открытую форму
            messageRepo.save(message);
        }
         // изъял из репозитория, положил в модель, отдал пользователю
