@@ -3,12 +3,15 @@ package com.example.twitterclone.controller;
 import com.example.twitterclone.domain.User;
 import com.example.twitterclone.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.validation.Valid;
 import java.util.Map;
@@ -18,6 +21,11 @@ public class RegistrationController {
     @Autowired
     private UserService userService;
 
+
+    @Value("${recaptcha.secret}")
+    private String secret;
+
+
     @GetMapping("/registration")
     public String registration(Model model)
     {
@@ -26,12 +34,23 @@ public class RegistrationController {
     }
 
     @PostMapping("/registration")
-    public String addUser(@Valid User user, BindingResult bindingResult, Model model) { // bindingresult чтобы получать ошибки валидации
+    public String addUser(
+            @RequestParam("password2") String passwordConfirmation,
+            @RequestParam("g-recaptcha-response") String captchaResponse,
+            @Valid User user,
+            BindingResult bindingResult, Model model) { // binding result чтобы получать ошибки валидации
+
+        boolean isConfirmEmpty = StringUtils.isEmpty(passwordConfirmation);
+
+        if (isConfirmEmpty) {
+            model.addAttribute("password2Error", "Password confirmation can't be empty");
+        }
+
         // проверка, сходится ли два пароля введенные при регистрации
-        if (user.getPassword() !=null && !user.getPassword().equals(user.getPassword2())) {
+        if (user.getPassword() !=null && !user.getPassword().equals(passwordConfirmation)) {
             model.addAttribute("passwordError", "Passwords are different!");
         }
-        if (bindingResult.hasErrors()) { // ошибки от @Validation
+        if (isConfirmEmpty || bindingResult.hasErrors()) { // ошибки от @Validation
             Map<String, String> errors = ControllerUtils.getErrors(bindingResult);
             model.mergeAttributes(errors);
             return "registration"; // возвращаем пользователя на страницу регистрации, чтобы не сохранился невалидный пользователь
@@ -48,8 +67,10 @@ public class RegistrationController {
         boolean isActivated = userService.activateUser(code);
 
         if (isActivated) {
+            model.addAttribute("messageType", "success");
             model.addAttribute("message", "User successfully activated");
         } else {
+            model.addAttribute("messageType", "danger");
             model.addAttribute("message", "Activation code is not found");
         }
 
