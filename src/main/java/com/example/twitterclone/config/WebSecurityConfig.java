@@ -39,6 +39,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter { // кла�
                     .loginPage("/login") // указываем, что loginPage находится на таком мепинге
                     .permitAll() // разрешение пользоваться всем
                 .and()
+                    .rememberMe() // сохранение сессий
+                .and()
                     .logout() // выход
                     .permitAll(); // разрешение пользоваться всем
     }
