@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -68,17 +69,7 @@ public class MainController {
            model.mergeAttributes(errorsMap);
            model.addAttribute("message", message);
        } else {
-           if (file != null && !file.getOriginalFilename().isEmpty()) {
-               File uploadDir = new File(uploadPath);
-               if (!uploadDir.exists()) {
-                   uploadDir.mkdir();
-               }
-
-               String uuidfile = UUID.randomUUID().toString();
-               String resultFileName = uuidfile + "." + file.getOriginalFilename();
-               file.transferTo(new File(uploadPath + "/" + resultFileName));
-               message.setFilename(resultFileName);
-           }
+           saveFile(message, file);
 
            model.addAttribute("message", null); // удаления message из модели после валидации, чтобы после добавления не получить открытую форму
            messageRepo.save(message);
@@ -90,16 +81,60 @@ public class MainController {
         return "main";
     }
 
+    private void saveFile(@Valid Message message, @RequestParam("file") MultipartFile file) throws IOException {
+        if (file != null && !file.getOriginalFilename().isEmpty()) {
+            File uploadDir = new File(uploadPath);
+            if (!uploadDir.exists()) {
+                uploadDir.mkdir();
+            }
+
+            String uuidfile = UUID.randomUUID().toString();
+            String resultFileName = uuidfile + "." + file.getOriginalFilename();
+            file.transferTo(new File(uploadPath + "/" + resultFileName));
+            message.setFilename(resultFileName);
+        }
+    }
+
     @GetMapping ("/user-messages/{user}")
     public String userMessages(
             @AuthenticationPrincipal User currentUser, // берёт юзера из сессии
             @PathVariable User user,
-            Model model
+            Model model,
+            @RequestParam(required = false) Message message
     ) {
         Set<Message> messages = user.getMessages();
         model.addAttribute("messages", messages);
+        model.addAttribute("message", message);
         model.addAttribute("isCurrentUser", currentUser.equals(user));
         return "userMessages";
+    }
+
+    @PostMapping ("/user-messages/{user}")
+    public String updateMessage(
+            @AuthenticationPrincipal User currentUser, // берёт юзера из сессии
+            @PathVariable Long user,
+            @RequestParam("id") Message message,
+            @RequestParam("text") String text,
+            @RequestParam("tag") String tag,
+            @RequestParam("file") MultipartFile file
+    ) throws IOException {
+
+        if (message.getAuthor().equals(currentUser)) {
+
+            if (!StringUtils.isEmpty(text)) {
+                message.setText(text);
+            }
+
+            if (!StringUtils.isEmpty(tag)) {
+                message.setTag(tag);
+            }
+
+            saveFile(message, file);
+            messageRepo.save(message);
+        }
+
+
+        return "redirect:/user-messages/" + user;
     }
 
 
