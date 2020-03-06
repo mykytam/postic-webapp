@@ -36,14 +36,16 @@ public class MainController {
     private String uploadPath;
 
     @GetMapping("/")
-    public String greeting(String name, Map<String, Object> model ) // то куда складывать данные, которые возвратятся пользователю
-    { return "greeting"; }
+    public String greeting(String name, Map<String, Object> model) // то куда складывать данные, которые возвратятся пользователю
+    {
+        return "greeting";
+    }
 
     @GetMapping("/main")
     public String main(@RequestParam(required = false, defaultValue = "") String filter, Model model) {
         Iterable<Message> messages = messageRepo.findAll();
 
-        if(filter != null && !filter.isEmpty()) {
+        if (filter != null && !filter.isEmpty()) {
             messages = messageRepo.findByTag(filter);
         } else {
             messages = messageRepo.findAll();
@@ -56,28 +58,28 @@ public class MainController {
     }
 
     @PostMapping("/main")
-    public String add( @AuthenticationPrincipal User user,
-                       @Valid Message message,
-                       BindingResult bindingResult, // список аргументов и сообщение ошибок валидации
-                       Model model, // @RequestParam выдергивает с запросов (либо форма, либо url) значения
-                       @RequestParam("file") MultipartFile file ) throws IOException {
+    public String add(@AuthenticationPrincipal User user,
+                      @Valid Message message,
+                      BindingResult bindingResult, // список аргументов и сообщение ошибок валидации
+                      Model model, // @RequestParam выдергивает с запросов (либо форма, либо url) значения
+                      @RequestParam("file") MultipartFile file) throws IOException {
         // сохранил
-       message.setAuthor(user);
-       if (bindingResult.hasErrors()) { // проверка ошибок bindingResult, сообщения не сохранять
-           Map<String, String> errorsMap = ControllerUtils.getErrors(bindingResult);
+        message.setAuthor(user);
+        if (bindingResult.hasErrors()) { // проверка ошибок bindingResult, сообщения не сохранять
+            Map<String, String> errorsMap = ControllerUtils.getErrors(bindingResult);
 
-           model.mergeAttributes(errorsMap);
-           model.addAttribute("message", message);
-       } else {
-           saveFile(message, file);
+            model.mergeAttributes(errorsMap);
+            model.addAttribute("message", message);
+        } else {
+            saveFile(message, file);
 
-           model.addAttribute("message", null); // удаления message из модели после валидации, чтобы после добавления не получить открытую форму
-           messageRepo.save(message);
-       }
+            model.addAttribute("message", null); // удаления message из модели после валидации, чтобы после добавления не получить открытую форму
+            messageRepo.save(message);
+        }
         // изъял из репозитория, положил в модель, отдал пользователю
         Iterable<Message> messages = messageRepo.findAll();
         model.addAttribute("messages", messages);
-       // model.put("filter", "");
+        // model.put("filter", "");
         return "main";
     }
 
@@ -95,7 +97,7 @@ public class MainController {
         }
     }
 
-    @GetMapping ("/user-messages/{user}")
+    @GetMapping("/user-messages/{user}")
     public String userMessages(
             @AuthenticationPrincipal User currentUser, // берёт юзера из сессии
             @PathVariable User user,
@@ -103,13 +105,17 @@ public class MainController {
             @RequestParam(required = false) Message message
     ) {
         Set<Message> messages = user.getMessages();
+        model.addAttribute("userChannel", user);
+        model.addAttribute("subscriptionsCount", user.getSubscriptions().size());
+        model.addAttribute("subscribersCount", user.getSubscribers().size());
+        model.addAttribute("isSubscriber", user.getSubscribers().contains(currentUser));// содержить ли список пользователя, на которого хотим подписаться, наш аккаунт
         model.addAttribute("messages", messages);
         model.addAttribute("message", message);
         model.addAttribute("isCurrentUser", currentUser.equals(user));
         return "userMessages";
     }
 
-    @PostMapping ("/user-messages/{user}")
+    @PostMapping("/user-messages/{user}")
     public String updateMessage(
             @AuthenticationPrincipal User currentUser, // берёт юзера из сессии
             @PathVariable Long user,
