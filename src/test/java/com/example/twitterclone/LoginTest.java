@@ -21,6 +21,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class) // анотация JUnit, указываем окружение, где стартует тест
 @SpringBootTest // комбо анотация, указывает, что запускаем тесты в окружении Spring Boot приложения
 @AutoConfigureMockMvc // Spring автоматические создаёт структуру классов подменяя слой Mvc
+@TestPropertySource("/application-test.properties") // указывает, какие пропертя брать для тестов
 public class LoginTest {
     @Autowired
     private MockMvc mockMvc;
@@ -42,8 +43,10 @@ public class LoginTest {
     }
 
     @Test
+    @Sql(value = {"/create-user-before.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD) // выполнить скрипт перед тестом
+    @Sql(value = {"/create-user-after.sql"}, executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD) // выполнить скрипт после теста
     public void correctLoginTest() throws Exception { // проверка авторизации
-        this.mockMvc.perform(formLogin().user("Jia").password("69")) // вызывает обращение к страничке
+        this.mockMvc.perform(formLogin().user("dima").password("69"))
                 .andDo(print())
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/"));
@@ -51,7 +54,7 @@ public class LoginTest {
 
     @Test
     public void badCredentials() throws Exception { // проверка отбивки на некоректные данные пользователя
-        this.mockMvc.perform(post("/login").param("user", "Jia")) // вызывает обращение к страничке
+        this.mockMvc.perform(post("/login").param("user", "dima")) // вызывает обращение к страничке
                 .andDo(print())
                 .andExpect(status().isForbidden()); // ждем 403
     }
