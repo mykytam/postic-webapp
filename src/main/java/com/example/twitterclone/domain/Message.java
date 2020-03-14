@@ -1,9 +1,12 @@
 package com.example.twitterclone.domain;
 
+import com.example.twitterclone.domain.util.MessageHelper;
 import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity // This tells Hibernate to make a table out of this class
 public class Message {
@@ -23,6 +26,15 @@ public class Message {
     private User author;
     private String filename;
 
+    @ManyToMany
+    @JoinTable(
+            name = "message_likes",
+            joinColumns = {@JoinColumn(name = "message_id")},
+            inverseJoinColumns = {@JoinColumn(name = "user_id")}
+    )
+    private Set<User> likes = new HashSet<>();
+
+
     public Message() {}
 
     public Message(String text, String tag, User user) {
@@ -33,7 +45,7 @@ public class Message {
 
     // проверка наличия автора
     public String getAuthorName() {
-        return author != null ? author.getUsername() : "<no author>";
+        return MessageHelper.getAuthorName(author);
     }
 
     public User getAuthor() { return author; }
@@ -63,4 +75,8 @@ public class Message {
     public String getFilename() { return filename; }
 
     public void setFilename(String filename) { this.filename = filename; }
+
+    public Set<User> getLikes() { return likes; }
+
+    public void setLikes(Set<User> likes) { this.likes = likes; }
 }
