@@ -68,7 +68,10 @@ public class MessageController {
                       @Valid Message message,
                       BindingResult bindingResult, // список аргументов и сообщение ошибок валидации
                       Model model, // @RequestParam выдергивает с запросов (либо форма, либо url) значения
-                      @RequestParam("file") MultipartFile file) throws IOException {
+                      @RequestParam(required = false, defaultValue = "") String filter,
+                      @PageableDefault(sort = { "id" }, direction = Sort.Direction.DESC) Pageable pageable,
+                      @RequestParam("file") MultipartFile file
+    ) throws IOException {
         // сохранил
         message.setAuthor(user);
         if (bindingResult.hasErrors()) { // проверка ошибок bindingResult, сообщения не сохранять
@@ -83,23 +86,25 @@ public class MessageController {
             messageRepo.save(message);
         }
         // изъял из репозитория, положил в модель, отдал пользователю
-        Iterable<Message> messages = messageRepo.findAll();
-        model.addAttribute("messages", messages);
-        // model.put("filter", "");
+        Page<MessageDto> page = messageService.messageList(pageable, filter, user);
+        model.addAttribute("page", page);
         return "main";
     }
 
     private void saveFile(@Valid Message message, @RequestParam("file") MultipartFile file) throws IOException {
         if (file != null && !file.getOriginalFilename().isEmpty()) {
             File uploadDir = new File(uploadPath);
+
             if (!uploadDir.exists()) {
                 uploadDir.mkdir();
             }
 
-            String uuidfile = UUID.randomUUID().toString();
-            String resultFileName = uuidfile + "." + file.getOriginalFilename();
-            file.transferTo(new File(uploadPath + "/" + resultFileName));
-            message.setFilename(resultFileName);
+            String uuidFile = UUID.randomUUID().toString();
+            String resultFilename = uuidFile + "." + file.getOriginalFilename();
+
+            file.transferTo(new File(uploadPath + "/" + resultFilename));
+
+            message.setFilename(resultFilename);
         }
     }
 
