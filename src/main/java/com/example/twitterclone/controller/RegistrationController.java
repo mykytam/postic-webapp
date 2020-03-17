@@ -34,8 +34,7 @@ public class RegistrationController {
     private RestTemplate restTemplate;
 
     @GetMapping("/registration")
-    public String registration(Model model)
-    {
+    public String registration(Model model) {
         model.addAttribute("message", "");
         return ("/registration");
     }
@@ -63,7 +62,7 @@ public class RegistrationController {
         }
 
         // проверка, сходится ли два пароля введенные при регистрации
-        if (user.getPassword() !=null && !user.getPassword().equals(passwordConfirmation)) {
+        if (user.getPassword() != null && !user.getPassword().equals(passwordConfirmation)) {
             model.addAttribute("passwordError", "Passwords are different!");
         }
         if (isConfirmEmpty || bindingResult.hasErrors() || !response.isSuccess()) { // ошибки от @Validation и тд

@@ -6,9 +6,9 @@
 
     <groupId>com.example</groupId>
     <artifactId>twitterClone</artifactId>
-    <version>1.0-SNAPSHOT</version>
-    <name>twitterClone</name>
-    <description>Demo project for Spring Boot</description>
+    <version>Final-version</version>
+    <name>Postic</name>
+    <description>Twitter clone web app made with Spring</description>
 
     <parent>
         <groupId>org.springframework.boot</groupId>

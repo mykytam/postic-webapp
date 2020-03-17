@@ -4,8 +4,12 @@
     <div class="form-row">
         <div class="form-group col-md-6">
             <form method="get" action="/main" class="form-inline">
+                <div>
                 <input type="text" name="filter" class="form-control" value="${filter?ifExists}" placeholder="Search by tag"/>
+                </div>
+                <div>
                 <button type="submit" class="btn btn-info ml-2">Search</button>
+                </div>
             </form>
         </div>
     </div>
