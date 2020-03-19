@@ -57,7 +57,7 @@ public class UserService implements UserDetailsService {
         if (!StringUtils.isEmpty(user.getEmail())) {
             String message = String.format(
                     "Hello, %s! \n" +
-                            "Welcome to Postic. Please, visit next link: https://postic.herokuapp.com/activate/%s",
+                            "Welcome to Postic! Please, visit next link: https://postic.herokuapp.com/activate/%s",
                     user.getUsername(),
                     user.getActivationCode()
             );
