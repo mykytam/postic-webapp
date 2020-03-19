@@ -41,7 +41,7 @@ public class UserService implements UserDetailsService {
             return false;
         }
 
-        user.setActive(true); // here false
+        user.setActive(false);
         user.setRoles(Collections.singleton(Role.USER));
         user.setActivationCode(UUID.randomUUID().toString());
         user.setPassword(passwordEncoder.encode(user.getPassword())); // шифрования пароля при регистрации
@@ -57,7 +57,7 @@ public class UserService implements UserDetailsService {
         if (!StringUtils.isEmpty(user.getEmail())) {
             String message = String.format(
                     "Hello, %s! \n" +
-                            "Welcome to Postic! Please, visit next link: https://postic.herokuapp.com/activate/%s",
+                            "Welcome to TwitterClone WebApp. Please, visit next link: http://localhost:8080/activate/%s",
                     user.getUsername(),
                     user.getActivationCode()
             );
@@ -74,7 +74,7 @@ public class UserService implements UserDetailsService {
         }
 
         user.setActivationCode(null);
-       // user.setActive(true);
+        user.setActive(true);
         userRepo.save(user);
 
         return true;
