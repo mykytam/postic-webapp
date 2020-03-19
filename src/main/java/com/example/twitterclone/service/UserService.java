@@ -26,7 +26,7 @@ public class UserService implements UserDetailsService {
     private PasswordEncoder passwordEncoder;
 
     @Override
-    public UserDetails loadUserByUsername(String username) {
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepo.findByUsername(username);
         if (user == null ) {
             throw new UsernameNotFoundException("User not found");
@@ -41,6 +41,7 @@ public class UserService implements UserDetailsService {
             return false;
         }
 
+        user.setActive(false);
         user.setRoles(Collections.singleton(Role.USER));
         user.setActivationCode(UUID.randomUUID().toString());
         user.setPassword(passwordEncoder.encode(user.getPassword())); // шифрования пароля при регистрации
@@ -56,7 +57,7 @@ public class UserService implements UserDetailsService {
         if (!StringUtils.isEmpty(user.getEmail())) {
             String message = String.format(
                     "Hello, %s! \n" +
-                            "Welcome to TwitterClone WebApp. Please, visit next link: http://localhost:8080/activate/%s",
+                            "Welcome to Postic. Please, visit next link: https://postic.herokuapp.com/activate/%s",
                     user.getUsername(),
                     user.getActivationCode()
             );
@@ -73,7 +74,7 @@ public class UserService implements UserDetailsService {
         }
 
         user.setActivationCode(null);
-
+        user.setActive(true);
         userRepo.save(user);
 
         return true;
@@ -86,12 +87,17 @@ public class UserService implements UserDetailsService {
     public void saveUser(User user, String username, Map<String, String> form) {
         user.setUsername(username);
 
-        Set<Role> roles = form.keySet()
-                .stream()
-                .filter(this::isInvalidRoleName)
-                .map(Role::valueOf)
+        Set<String> roles = Arrays.stream(Role.values())
+                .map(Role::name)
                 .collect(Collectors.toSet());
-        user.setRoles(roles);
+
+        user.getRoles().clear();
+
+        for (String key : form.keySet()) {
+            if (roles.contains(key)) {
+                user.getRoles().add(Role.valueOf(key));
+            }
+        }
 
         userRepo.save(user);
     }
@@ -101,8 +107,8 @@ public class UserService implements UserDetailsService {
         String userEmail = user.getEmail();
 
         // изменение email, если проверка прошла успешно
-        boolean isEmailChanged = (email != null && !email.equals(userEmail))
-                || (userEmail != null && !userEmail.equals(email));
+        boolean isEmailChanged = (email != null && !email.equals(userEmail)) ||
+                (userEmail != null && !userEmail.equals(email));
 
         // изменение email, если проверка прошла успешно
         if (isEmailChanged) {
@@ -134,9 +140,5 @@ public class UserService implements UserDetailsService {
     public void unsubscribe(User currentUser, User user) { // отписка
         user.getSubscribers().remove(currentUser);
         userRepo.save(user);
-    }
-
-    private boolean isInvalidRoleName(String s) {
-        return !Arrays.stream(Role.values()).map(Role::name).collect(Collectors.toSet()).contains(s);
     }
 }
