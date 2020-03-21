@@ -8,13 +8,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import static org.apache.logging.log4j.util.Strings.isNotEmpty;
+
 @Service
 public class MessageService {
     @Autowired
     private MessageRepo messageRepo;
 
     public Page<MessageDto> messageList(Pageable pageable, String filter, User user) {
-        if (filter != null && !filter.isEmpty()) {
+        if (isNotEmpty(filter)) {
             return  messageRepo.findByTag(filter, pageable, user);
         } else {
             return messageRepo.findAll(pageable, user);

@@ -41,9 +41,9 @@ public class UserController {
             @RequestParam String username,
             @RequestParam Map<String, String> form,
             @RequestParam("userId") User user
-    )
-    { userService.saveUser(user, username, form);
-      return "redirect:/user";
+    ) {
+        userService.saveUser(user, username, form);
+        return "redirect:/user";
     }
 
     @GetMapping("profile")

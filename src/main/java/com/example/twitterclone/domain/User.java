@@ -22,7 +22,6 @@ public class User implements UserDetails {
     @NotBlank(message = "Password can't be empty")
     private String password;
 
-    private boolean active;
     @Email(message = "Email is not correct")
     @NotBlank(message = "Email can't be empty")
     private String email;
@@ -89,7 +88,7 @@ public class User implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return isActive();
+        return activationCode == null;
     }
 
     @Override
@@ -119,14 +118,6 @@ public class User implements UserDetails {
 
     public void setPassword(String password) {
         this.password = password;
-    }
-
-    public boolean isActive() {
-        return active;
-    }
-
-    public void setActive(boolean active) {
-        this.active = active;
     }
 
     public Set<Role> getRoles() {
