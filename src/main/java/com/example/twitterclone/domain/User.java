@@ -26,10 +26,10 @@ public class User implements UserDetails {
     @NotBlank(message = "Email can't be empty")
     private String email;
     private String activationCode;
-
+    private boolean active;
     @ElementCollection(targetClass = Role.class, fetch = FetchType.EAGER)
     @CollectionTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"))
-// будет храниться в отдельной таблице для которой не описан меппинг
+    // будет храниться в отдельной таблице для которой не описан меппинг
     @Enumerated(EnumType.STRING) // enum хранить в виде строки
     private Set<Role> roles;
 
@@ -167,4 +167,13 @@ public class User implements UserDetails {
     public void setSubscriptions(Set<User> subscriptions) {
         this.subscriptions = subscriptions;
     }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+
 }

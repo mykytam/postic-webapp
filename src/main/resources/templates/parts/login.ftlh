@@ -1,7 +1,6 @@
 <#include "security.ftlh">
 <#macro login path isRegisterForm>
     <form action="${path}" method="post">
-        <br>
         <div class="form-group row">
             <label class="col-sm-2 col-form-label">User Name :</label>
             <div class="col-sm-6">
@@ -50,21 +49,12 @@
                            placeholder="some@some.com" />
                     <#if emailError??>
                         <div class="invalid-feedback">
+
                             ${emailError}
                         </div>
                     </#if>
                 </div>
             </div>
-            <br>
-            <div class = "col-sm-6">
-                <div class="g-recaptcha" data-sitekey="6Le7Z90UAAAAAI-ir6zJZpcKaHQGFyDer-vbLexp"></div>
-                <#if captchaError??>
-                    <div class="alert alert-danger" role="alert">
-                        ${captchaError}
-                    </div>
-                </#if>
-            </div>
-            <br>
         </#if>
         <input type="hidden" name="_csrf" value="${_csrf.token}" />
         <#if !isRegisterForm><a class="btn btn-secondary" href="/registration">Add new user</a></#if>

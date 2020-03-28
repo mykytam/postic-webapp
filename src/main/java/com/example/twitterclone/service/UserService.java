@@ -26,7 +26,7 @@ public class UserService implements UserDetailsService {
     private PasswordEncoder passwordEncoder;
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String username) {
         User user = userRepo.findByUsername(username);
         if (user == null ) {
             throw new UsernameNotFoundException("User not found");
@@ -90,7 +90,6 @@ public class UserService implements UserDetailsService {
         Set<String> roles = Arrays.stream(Role.values())
                 .map(Role::name)
                 .collect(Collectors.toSet());
-
         user.getRoles().clear();
 
         for (String key : form.keySet()) {
@@ -102,13 +101,14 @@ public class UserService implements UserDetailsService {
         userRepo.save(user);
     }
 
+
     public void updateProfile(User user, String password, String email) {
         //проверка email
         String userEmail = user.getEmail();
 
         // изменение email, если проверка прошла успешно
-        boolean isEmailChanged = (email != null && !email.equals(userEmail)) ||
-                (userEmail != null && !userEmail.equals(email));
+        boolean isEmailChanged = (email != null && !email.equals(userEmail))
+                || (userEmail != null && !userEmail.equals(email));
 
         // изменение email, если проверка прошла успешно
         if (isEmailChanged) {
